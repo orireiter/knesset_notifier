@@ -1,42 +1,39 @@
-from typing import Optional
 from datetime import datetime
-from dataclasses import dataclass
+
+from pydantic import BaseModel, validator
 
 
-@dataclass
-class ProtocolLineDto:
-    CommitteeSessionID: Optional[str] = None
-    Number: Optional[str] = None
-    KnessetNum: Optional[str] = None
-    TypeID: Optional[str] = None
-    TypeDesc: Optional[str] = None
-    CommitteeID: Optional[str] = None
-    Location: Optional[str] = None
-    SessionUrl: Optional[str] = None
-    BroadcastUrl: Optional[str] = None
-    StartDate: Optional[str] = None
-    FinishDate: Optional[str] = None
-    Note: Optional[str] = None
-    LastUpdatedDate: Optional[str] = None
-    download_crc32c: Optional[str] = None
-    download_filename: Optional[str] = None
-    download_filesize: Optional[str] = None
-    parts_crc32c: Optional[str] = None
-    parts_filesize: Optional[str] = None
-    parts_parsed_filename: Optional[str] = None
-    text_crc32c: Optional[str] = None
-    text_filesize: Optional[str] = None
-    text_parsed_filename: Optional[str] = None
-    item_ids: Optional[str] = None
-    item_type_ids: Optional[str] = None
-    topics: Optional[str] = None
-    committee_name: Optional[str] = None
-    bill_names: Optional[str] = None
-    bill_types: Optional[str] = None
-    related_to_legislation: Optional[str] = None
-    mks: Optional[str] = None
-    invitees: Optional[str] = None
-    legal_advisors: Optional[str] = None
-    manager: Optional[str] = None
-    financial_advisors: Optional[str] = None
-    attended_mk_individual_ids: Optional[str] = None
+class ProtocolLineDto(BaseModel):
+    committee_session_id: str
+    number: int
+    knesset_num: int
+    type_id: str
+    type_description: str
+    committee_id: str
+    location: str
+    session_url: str
+    broadcast_url: str
+    start_date: datetime
+    finish_date: datetime
+    note: str
+    last_updated_date: datetime
+    item_ids: list[str]
+    item_type_ids: list[str]
+    topics: list[str]
+    committee_name: str
+    bill_names: list[str]
+    bill_types: list[str]
+    related_to_legislation: bool
+    mks: list[str]
+    invitees: list[str]
+    legal_advisors: list[str]
+    manager: str
+    financial_advisors: list[str]
+    attended_mk_individual_ids: list[str]
+
+    @validator("start_date", pre=True)
+    def parse_birthdate(cls, value):
+        return datetime.strptime(
+            value,
+            "%d/%m/%Y"
+        ).date()

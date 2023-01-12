@@ -1,8 +1,8 @@
-from lobby_actions.logic.protocol_file_logic import KnessetProtocolsRetriever
+from lobby_actions.logic.protocol_file_logic import KnessetProtocolsETL
 
 if __name__ == "__main__":
-    retriever = KnessetProtocolsRetriever()
+    retriever = KnessetProtocolsETL()
 
-    lines = retriever.get_events_from_last_x_days_ago_to_now()
+    lines = retriever.run_etl()
 
     x = 1
