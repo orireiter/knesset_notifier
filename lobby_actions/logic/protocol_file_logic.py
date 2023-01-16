@@ -1,10 +1,14 @@
 import io
 import csv
+import logging
 from datetime import datetime, timedelta
 
 import requests
 
 from lobby_actions.data import models
+
+
+logger = logging.getLogger(__name__)
 
 
 class KnessetProtocolExtractor:
@@ -53,10 +57,13 @@ class KnessetProtocolTransformer:
 
         relevant_lines = []
         for line in response.iter_lines():
-            as_dto = self._transform_line_to_dto(line=line)
+            try:
+                as_dto = self._transform_line_to_dto(line=line)
 
-            if self._is_line_valid(as_dto):
-                relevant_lines.append(as_dto)
+                if self._is_line_valid(as_dto):
+                    relevant_lines.append(as_dto)
+            except Exception as e:
+                continue
 
         return relevant_lines
 
@@ -68,17 +75,19 @@ class KnessetProtocolTransformer:
     def _transform_line_to_dto(self, line: bytes) -> models.ProtocolLineDto:
         try:
             as_str = line.decode()
+
             as_string_io = io.StringIO(as_str)
             as_list = list(csv.reader(as_string_io))[0]
 
             as_dict_with_field_names = {
                 self.RAW_FIELD_NAMES_TO_TRANSFORMED_DATA[key]: value
-                for key, value in zip(self._field_names, as_list) if key in self.RAW_FIELD_NAMES_TO_TRANSFORMED_DATA.get(key)
+                for key, value in zip(self._field_names, as_list) if self.RAW_FIELD_NAMES_TO_TRANSFORMED_DATA.get(key)
             }
 
+            logger.info(f'transforming {as_dict_with_field_names=}')
             return models.ProtocolLineDto(**as_dict_with_field_names)
         except Exception as e:
-            pass
+            logger.exception(f'failed to transfrom line to dto {line.decode()}')
 
     def _is_line_valid(self, protocol_line: models.ProtocolLineDto) -> bool:
         return all(
@@ -90,10 +99,10 @@ class KnessetProtocolTransformer:
         )
 
     def _is_event_date_new_enough(self, protocol_line: models.ProtocolLineDto) -> bool:
-        return self._x_days_ago_as_datetime < protocol_line.StartDate
+        return self._x_days_ago_as_datetime < protocol_line.start_date
 
     def _is_containing_lobbyist(self, protocol_line: models.ProtocolLineDto) -> bool:
-        pass
+        return True
 
 
 class KnessetProtocolLoader:
