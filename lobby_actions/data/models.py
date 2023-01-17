@@ -58,13 +58,14 @@ class ProtocolLineDto(BaseModel):
         pre=True,
     )
     def parse_list_of_str(cls, value, values, config, field):
-        the_list = [str(after) for after in json.loads(value)]
-        return the_list
+        list_from_json = json.loads(value) if value else []
+        list_of_strs = [str(after) for after in list_from_json]
+        return list_of_strs
 
     @validator(
         "invitees",
         pre=True,
     )
     def parse_list_of_dict(cls, value, values, config, field):
-        the_list = json.loads(value)
-        return the_list
+        list_from_json = json.loads(value) if value else []
+        return list_from_json

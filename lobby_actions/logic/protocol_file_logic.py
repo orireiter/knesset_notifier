@@ -1,6 +1,7 @@
 import io
 import csv
 import logging
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 import requests
@@ -48,24 +49,25 @@ class KnessetProtocolTransformer:
         "attended_mk_individual_ids": "attended_mk_individual_ids",
     }
 
-    def __init__(self, x_days_ago_as_datetime: datetime):
+    def __init__(self, x_days_ago_as_datetime: datetime, lobbyists_to_check: list[str] = None):
         self._x_days_ago_as_datetime = x_days_ago_as_datetime
         self._field_names = []
+        self.lobbyists_to_check = lobbyists_to_check or []
+        self.lobbyists_activity_summary = defaultdict(list)
 
     def transform(self, response: requests.Response):
         self._field_names = self._get_key_names_of_file(response=response)
 
-        relevant_lines = []
         for line in response.iter_lines():
             try:
                 as_dto = self._transform_line_to_dto(line=line)
 
                 if self._is_line_valid(as_dto):
-                    relevant_lines.append(as_dto)
+                    self._append_line_to_relevant_lobbyists_summary(protocol_line=as_dto)
             except Exception as e:
                 continue
 
-        return relevant_lines
+        return self.lobbyists_activity_summary
 
     def _get_key_names_of_file(self, response: requests.Response) -> list:
         field_names_as_str: str = response.iter_lines().__next__().decode()
@@ -88,21 +90,25 @@ class KnessetProtocolTransformer:
             return models.ProtocolLineDto(**as_dict_with_field_names)
         except Exception as e:
             logger.exception(f'failed to transfrom line to dto {line.decode()}')
+            raise e
 
     def _is_line_valid(self, protocol_line: models.ProtocolLineDto) -> bool:
         return all(
             [
                 protocol_line,
                 self._is_event_date_new_enough(protocol_line),
-                self._is_containing_lobbyist(protocol_line),
             ]
         )
 
     def _is_event_date_new_enough(self, protocol_line: models.ProtocolLineDto) -> bool:
         return self._x_days_ago_as_datetime < protocol_line.start_date
 
-    def _is_containing_lobbyist(self, protocol_line: models.ProtocolLineDto) -> bool:
-        return True
+    def _append_line_to_relevant_lobbyists_summary(self, protocol_line: models.ProtocolLineDto):
+        invitees_names = {invitee_dict.get('name') for invitee_dict in protocol_line.invitees}
+        for lobbyist_name in self.lobbyists_to_check:
+            for invitee_name in invitees_names:
+                if lobbyist_name in invitee_name:
+                    self.lobbyists_activity_summary[lobbyist_name].append(protocol_line)
 
 
 class KnessetProtocolLoader:
