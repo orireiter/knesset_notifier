@@ -2,20 +2,20 @@ LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': True,
     'formatters': {
-        'simpleFormatter': {
+        'base_formatter': {
             'format': '%(asctime)s - %(process)d - %(levelname)s - %(name)s - %(message)s'
         },
     },
     'handlers': {
-        'consoleHandler': {
+        'stdout_handler': {
             'class': 'logging.StreamHandler',
             'level': 'INFO',
-            'formatter': 'simpleFormatter',
+            'formatter': 'simple_formatter',
             'stream': 'ext://sys.stdout',
         },
     },
     'root': {
-            'handlers': ['consoleHandler'],
+            'handlers': ['stdout_handler'],
             'level': 'DEBUG',
     }
 }
