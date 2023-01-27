@@ -49,7 +49,7 @@ class KnessetProtocolTransformer:
         "attended_mk_individual_ids": "attended_mk_individual_ids",
     }
 
-    def __init__(self, x_days_ago_as_datetime: datetime, lobbyists_to_check: list[str] = None):
+    def __init__(self, x_days_ago_as_datetime: datetime = datetime.utcnow() - timedelta(days=14), lobbyists_to_check: list[str] = None):
         self._x_days_ago_as_datetime = x_days_ago_as_datetime
         self._field_names = []
         self.lobbyists_to_check = lobbyists_to_check or []
