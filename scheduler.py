@@ -1,5 +1,8 @@
 from apscheduler.schedulers.background import BlockingScheduler
 
+from lobby_actions.utils import load_env_vars
+load_env_vars()
+
 from lobby_actions.logic.protocol_file_logic import KnessetProtocolsETL, KnessetProtocolTransformer
 from lobby_actions.logic.lobbyist_logic import get_lobbyists_from_etl
 
