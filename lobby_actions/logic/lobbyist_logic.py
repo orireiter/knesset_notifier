@@ -2,7 +2,9 @@ from playwright.sync_api import sync_playwright, Page
 
 
 class LobbyistNamesExtractor:
-    URL_WITH_LOBBYISTS_NAME_TO_SCRAPE = "https://main.knesset.gov.il/About/Lobbyist/Pages/Lobbyist.aspx"
+    URL_WITH_LOBBYISTS_NAME_TO_SCRAPE = (
+        "https://main.knesset.gov.il/About/Lobbyist/Pages/Lobbyist.aspx"
+    )
     LOBBYIST_TR_XPATH = '//tr[contains(@id, "Result")]'
     GO_TO_NEXT_PAGE_XPATH = '//a[contains(@id, "Next")]'
 
@@ -15,20 +17,24 @@ class LobbyistNamesExtractor:
             return lobbyist_names
 
     def _scrape_all_lobbyists_names(self, playwright_page: Page):
-        playwright_page.goto(url=self.URL_WITH_LOBBYISTS_NAME_TO_SCRAPE, wait_until='domcontentloaded')
-        playwright_page.wait_for_load_state('networkidle')
+        playwright_page.goto(
+            url=self.URL_WITH_LOBBYISTS_NAME_TO_SCRAPE, wait_until="domcontentloaded"
+        )
+        playwright_page.wait_for_load_state("networkidle")
 
         names = set()
         for page_index in range(10):
-            names.update(self._get_names_from_current_page(playwright_page=playwright_page))
+            names.update(
+                self._get_names_from_current_page(playwright_page=playwright_page)
+            )
 
             next_button = playwright_page.locator(self.GO_TO_NEXT_PAGE_XPATH).first
             if next_button.is_disabled():
                 break
 
             next_button.click()
-            playwright_page.wait_for_load_state('domcontentloaded')
-            playwright_page.wait_for_load_state('networkidle')
+            playwright_page.wait_for_load_state("domcontentloaded")
+            playwright_page.wait_for_load_state("networkidle")
 
         return names
 
@@ -38,7 +44,7 @@ class LobbyistNamesExtractor:
         lobbyists_names = []
 
         for table_row in table_rows_of_lobbyists:
-            name = table_row.locator('xpath=/td').first.text_content().strip()
+            name = table_row.locator("xpath=/td").first.text_content().strip()
             lobbyists_names.append(name)
 
         return lobbyists_names
