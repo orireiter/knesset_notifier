@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 import requests
 
 from lobby_actions.data import models
+from lobby_actions.third_parties.gmail import GmailSmtp
+from lobby_actions.config.lobby99_config import Lobby99Config
 
 
 logger = logging.getLogger(__name__)
@@ -112,8 +114,28 @@ class KnessetProtocolTransformer:
 
 
 class KnessetProtocolLoader:
-    def load(self, transformed_data):
-        pass
+    def load(self, transformed_data: dict):
+        if not transformed_data:
+            return
+
+        try:
+            mail_content = self._transform_data_to_mail_content(transformed_data)
+            GmailSmtp().send_mail(receivers=Lobby99Config.Email.LOBBY_ACTION_EMAILS_TO_REPORT_TO, subject='דו״ח פעילות לוביסטים שבועית', content=mail_content, is_rtl=True)
+        except Exception as e:
+            pass
+
+    def _transform_data_to_mail_content(self, data: dict) -> str:
+        mail_content = 'דו״ח פעילות לוביסטים שבועית:' + '\n\n'
+
+        for lobbyist_name, attended_events in data.items():
+            mail_content += f'{lobbyist_name}:\n'
+
+            for event in attended_events:
+                mail_content += f'{event.start_date} - {event.committee_name} - {event.topics}\n'
+
+            mail_content += '\n'
+
+        return mail_content
 
 
 class KnessetProtocolsETL:
@@ -123,7 +145,7 @@ class KnessetProtocolsETL:
         self,
         extractor: KnessetProtocolExtractor = KnessetProtocolExtractor(),
         transformer: KnessetProtocolTransformer = KnessetProtocolTransformer(
-            x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=14)
+            x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=7)
         ),
         loader: KnessetProtocolLoader = KnessetProtocolLoader(),
     ):
