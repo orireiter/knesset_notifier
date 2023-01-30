@@ -10,7 +10,7 @@ LOGGING_CONFIG = {
         'stdout_handler': {
             'class': 'logging.StreamHandler',
             'level': 'INFO',
-            'formatter': 'simple_formatter',
+            'formatter': 'base_formatter',
             'stream': 'ext://sys.stdout',
         },
     },

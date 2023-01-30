@@ -1,5 +1,6 @@
 import logging
 from logging.config import dictConfig
+from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BlockingScheduler
 
 from lobby_actions.utils import load_env_vars
@@ -24,7 +25,7 @@ scheduler = BlockingScheduler()
 def notify_lobbyists_actions_by_mail():
     try:
         lobbyists = get_lobbyists_from_etl()
-        transformer = KnessetProtocolTransformer(lobbyists_to_check=lobbyists or [])
+        transformer = KnessetProtocolTransformer(x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=350), lobbyists_to_check=lobbyists or [])
         KnessetProtocolsETL(transformer=transformer).run_etl()
     except Exception as e:
         pass

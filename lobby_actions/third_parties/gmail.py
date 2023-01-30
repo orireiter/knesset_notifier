@@ -1,8 +1,12 @@
 import os
+import logging
 import smtplib
 
 # Here are the email package modules we'll need.
 from email.message import EmailMessage
+
+
+logger = logging.getLogger(__name__)
 
 
 class GmailSmtp:
@@ -15,8 +19,8 @@ class GmailSmtp:
         self._user_id = user_id
         self._password = password
 
-    def send_mail(self, receivers: list[str], subject: str, content: str):
-        email_to_send = self._build_email(receivers=receivers, subject=subject, content=content)
+    def send_mail(self, receivers: list[str], subject: str, content: str, is_rtl: bool = False):
+        email_to_send = self._build_email(receivers=receivers, subject=subject, content=content, is_rtl=is_rtl)
 
         with smtplib.SMTP(self._smtp_server_url, self._smtp_server_port) as server:
             server.ehlo()
@@ -26,7 +30,7 @@ class GmailSmtp:
             server.login(self._user_id, self._password)
             server.sendmail(self._user_id, receivers, email_to_send.as_string())
 
-    def _build_email(self, receivers: list[str], subject: str, content: str):
+    def _build_email(self, receivers: list[str], subject: str, content: str, is_rtl: bool = False):
         # Create the container email message.
         msg = EmailMessage()
         msg['Subject'] = subject or ''
@@ -35,6 +39,9 @@ class GmailSmtp:
         msg['To'] = ', '.join(receivers)
         # msg.preamble = 'You will not see this in a MIME-aware mail reader.\n'
 
-        msg.set_content(content or '')
+        # todo fix rtl
+        content = f'<div style="direction:rtl">{content}</div>' if content and is_rtl else ''
+        logger.info(f'sending from {self._user_id} to {receivers=} {subject=} {content=}')
+        msg.set_content(content)
 
         return msg

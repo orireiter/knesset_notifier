@@ -115,9 +115,12 @@ class KnessetProtocolTransformer:
 
 class KnessetProtocolLoader:
     def load(self, transformed_data: dict):
+        if not transformed_data:
+            return
+
         try:
             mail_content = self._transform_data_to_mail_content(transformed_data)
-            GmailSmtp().send_mail(receivers=Lobby99Config.Email.LOBBY_ACTION_EMAILS_TO_REPORT_TO, subject='דו״ח פעילות לוביסטים שבועית - ', content=mail_content)
+            GmailSmtp().send_mail(receivers=Lobby99Config.Email.LOBBY_ACTION_EMAILS_TO_REPORT_TO, subject='דו״ח פעילות לוביסטים שבועית', content=mail_content, is_rtl=True)
         except Exception as e:
             pass
 
@@ -125,8 +128,12 @@ class KnessetProtocolLoader:
         mail_content = 'דו״ח פעילות לוביסטים שבועית:' + '\n\n'
 
         for lobbyist_name, attended_events in data.items():
-            # todo finish this
-            pass
+            mail_content += f'{lobbyist_name}:\n'
+
+            for event in attended_events:
+                mail_content += f'{event.start_date} - {event.committee_name} - {event.topics}\n'
+
+            mail_content += '\n'
 
         return mail_content
 
