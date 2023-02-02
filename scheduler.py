@@ -35,5 +35,4 @@ def notify_lobbyists_actions_by_mail():
 
 
 if __name__ == "__main__":
-    notify_lobbyists_actions_by_mail()
     scheduler.start()
