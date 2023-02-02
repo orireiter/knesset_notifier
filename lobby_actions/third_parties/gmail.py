@@ -34,7 +34,7 @@ class GmailSmtp:
             server.ehlo()
 
             server.login(self._user_id, self._password)
-            server.sendmail(self._user_id, receivers, email_to_send.as_string())
+            server.sendmail(self._user_id, receivers, email_to_send.as_string().encode('UTF-8'))
 
     def _build_email(
             self, receivers: list[str], subject: str, content: str, is_rtl: bool = False
@@ -47,13 +47,14 @@ class GmailSmtp:
         msg["To"] = ", ".join(receivers)
         # msg.preamble = 'You will not see this in a MIME-aware mail reader.\n'
 
-        # todo fix rtl
-        content = (
-            f'<div style="direction:rtl">{content}</div>' if content and is_rtl else ""
-        )
+        if content and is_rtl:
+            content = f'<div style="direction:rtl">{content}</div>'
+            content = content.replace('\n', '<br>')
+            msg.add_header('Content-Type', 'text/html')
+
         logger.info(
             f"sending from {self._user_id} to {receivers=} {subject=} {content=}"
         )
-        msg.set_content(content)
+        msg.set_payload(content)
 
         return msg
