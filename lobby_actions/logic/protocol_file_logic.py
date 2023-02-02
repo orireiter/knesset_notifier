@@ -51,9 +51,9 @@ class KnessetProtocolTransformer:
     }
 
     def __init__(
-            self,
-            x_days_ago_as_datetime: datetime = datetime.utcnow() - timedelta(days=14),
-            lobbyists_to_check: list[str] = None,
+        self,
+        x_days_ago_as_datetime: datetime = datetime.utcnow() - timedelta(days=14),
+        lobbyists_to_check: list[str] = None,
     ):
         self._x_days_ago_as_datetime = x_days_ago_as_datetime
         self._field_names = []
@@ -112,7 +112,7 @@ class KnessetProtocolTransformer:
         return self._x_days_ago_as_datetime < protocol_line.start_date
 
     def _append_line_to_relevant_lobbyists_summary(
-            self, protocol_line: models.ProtocolLineDto
+        self, protocol_line: models.ProtocolLineDto
     ):
         invitees_names = {
             invitee_dict.get("name") for invitee_dict in protocol_line.invitees
@@ -159,12 +159,12 @@ class KnessetProtocolsETL:
     PROTOCOL_FILE_URL = "https://storage.googleapis.com/knesset-data-pipelines/data/people/committees/meeting-attendees/kns_committeesession.csv"
 
     def __init__(
-            self,
-            extractor: KnessetProtocolExtractor = KnessetProtocolExtractor(),
-            transformer: KnessetProtocolTransformer = KnessetProtocolTransformer(
-                x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=7)
-            ),
-            loader: KnessetProtocolLoader = KnessetProtocolLoader(),
+        self,
+        extractor: KnessetProtocolExtractor = KnessetProtocolExtractor(),
+        transformer: KnessetProtocolTransformer = KnessetProtocolTransformer(
+            x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=7)
+        ),
+        loader: KnessetProtocolLoader = KnessetProtocolLoader(),
     ):
         self._field_names = []
         self.extractor = extractor
