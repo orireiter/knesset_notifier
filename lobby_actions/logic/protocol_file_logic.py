@@ -10,7 +10,6 @@ from lobby_actions.data import models
 from lobby_actions.third_parties.gmail import GmailSmtp
 from lobby_actions.config.lobby99_config import Lobby99Config
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -51,7 +50,11 @@ class KnessetProtocolTransformer:
         "attended_mk_individual_ids": "attended_mk_individual_ids",
     }
 
-    def __init__(self, x_days_ago_as_datetime: datetime = datetime.utcnow() - timedelta(days=14), lobbyists_to_check: list[str] = None):
+    def __init__(
+            self,
+            x_days_ago_as_datetime: datetime = datetime.utcnow() - timedelta(days=14),
+            lobbyists_to_check: list[str] = None,
+    ):
         self._x_days_ago_as_datetime = x_days_ago_as_datetime
         self._field_names = []
         self.lobbyists_to_check = lobbyists_to_check or []
@@ -65,7 +68,9 @@ class KnessetProtocolTransformer:
                 as_dto = self._transform_line_to_dto(line=line)
 
                 if self._is_line_valid(as_dto):
-                    self._append_line_to_relevant_lobbyists_summary(protocol_line=as_dto)
+                    self._append_line_to_relevant_lobbyists_summary(
+                        protocol_line=as_dto
+                    )
             except Exception as e:
                 continue
 
@@ -85,13 +90,14 @@ class KnessetProtocolTransformer:
 
             as_dict_with_field_names = {
                 self.RAW_FIELD_NAMES_TO_TRANSFORMED_DATA[key]: value
-                for key, value in zip(self._field_names, as_list) if self.RAW_FIELD_NAMES_TO_TRANSFORMED_DATA.get(key)
+                for key, value in zip(self._field_names, as_list)
+                if self.RAW_FIELD_NAMES_TO_TRANSFORMED_DATA.get(key)
             }
 
-            logger.info(f'transforming {as_dict_with_field_names=}')
+            logger.info(f"transforming {as_dict_with_field_names=}")
             return models.ProtocolLineDto(**as_dict_with_field_names)
         except Exception as e:
-            logger.exception(f'failed to transfrom line to dto {line.decode()}')
+            logger.exception(f"failed to transfrom line to dto {line.decode()}")
             raise e
 
     def _is_line_valid(self, protocol_line: models.ProtocolLineDto) -> bool:
@@ -105,8 +111,12 @@ class KnessetProtocolTransformer:
     def _is_event_date_new_enough(self, protocol_line: models.ProtocolLineDto) -> bool:
         return self._x_days_ago_as_datetime < protocol_line.start_date
 
-    def _append_line_to_relevant_lobbyists_summary(self, protocol_line: models.ProtocolLineDto):
-        invitees_names = {invitee_dict.get('name') for invitee_dict in protocol_line.invitees}
+    def _append_line_to_relevant_lobbyists_summary(
+            self, protocol_line: models.ProtocolLineDto
+    ):
+        invitees_names = {
+            invitee_dict.get("name") for invitee_dict in protocol_line.invitees
+        }
         for lobbyist_name in self.lobbyists_to_check:
             for invitee_name in invitees_names:
                 if lobbyist_name in invitee_name:
@@ -120,20 +130,27 @@ class KnessetProtocolLoader:
 
         try:
             mail_content = self._transform_data_to_mail_content(transformed_data)
-            GmailSmtp().send_mail(receivers=Lobby99Config.Email.LOBBY_ACTION_EMAILS_TO_REPORT_TO, subject='דו״ח פעילות לוביסטים שבועית', content=mail_content, is_rtl=True)
+            GmailSmtp().send_mail(
+                receivers=Lobby99Config.Email.LOBBY_ACTION_EMAILS_TO_REPORT_TO,
+                subject="דו״ח פעילות לוביסטים שבועית",
+                content=mail_content,
+                is_rtl=True,
+            )
         except Exception as e:
             pass
 
     def _transform_data_to_mail_content(self, data: dict) -> str:
-        mail_content = 'דו״ח פעילות לוביסטים שבועית:' + '\n\n'
+        mail_content = "דו״ח פעילות לוביסטים שבועית:" + "\n\n"
 
         for lobbyist_name, attended_events in data.items():
-            mail_content += f'{lobbyist_name}:\n'
+            mail_content += f"{lobbyist_name}:\n"
 
             for event in attended_events:
-                mail_content += f'{event.start_date} - {event.committee_name} - {event.topics}\n'
+                mail_content += (
+                    f"{event.start_date} - {event.committee_name} - {event.topics}\n"
+                )
 
-            mail_content += '\n'
+            mail_content += "\n"
 
         return mail_content
 
@@ -142,12 +159,12 @@ class KnessetProtocolsETL:
     PROTOCOL_FILE_URL = "https://storage.googleapis.com/knesset-data-pipelines/data/people/committees/meeting-attendees/kns_committeesession.csv"
 
     def __init__(
-        self,
-        extractor: KnessetProtocolExtractor = KnessetProtocolExtractor(),
-        transformer: KnessetProtocolTransformer = KnessetProtocolTransformer(
-            x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=7)
-        ),
-        loader: KnessetProtocolLoader = KnessetProtocolLoader(),
+            self,
+            extractor: KnessetProtocolExtractor = KnessetProtocolExtractor(),
+            transformer: KnessetProtocolTransformer = KnessetProtocolTransformer(
+                x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=7)
+            ),
+            loader: KnessetProtocolLoader = KnessetProtocolLoader(),
     ):
         self._field_names = []
         self.extractor = extractor

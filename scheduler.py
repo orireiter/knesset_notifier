@@ -14,9 +14,7 @@ from lobby_actions.logic.protocol_file_logic import (
     KnessetProtocolTransformer,
 )
 
-
 logger = logging.getLogger(__name__)
-
 
 scheduler = BlockingScheduler()
 
@@ -25,7 +23,10 @@ scheduler = BlockingScheduler()
 def notify_lobbyists_actions_by_mail():
     try:
         lobbyists = get_lobbyists_from_etl()
-        transformer = KnessetProtocolTransformer(x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=350), lobbyists_to_check=lobbyists or [])
+        transformer = KnessetProtocolTransformer(
+            x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=7),
+            lobbyists_to_check=lobbyists or [],
+        )
         KnessetProtocolsETL(transformer=transformer).run_etl()
     except Exception as e:
         pass
