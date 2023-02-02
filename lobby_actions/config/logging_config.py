@@ -1,9 +1,12 @@
+from json import dumps
+
+
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": True,
     "formatters": {
         "base_formatter": {
-            "format": "%(asctime)s - %(process)d - %(levelname)s - %(name)s - %(message)s"
+            "format": dumps({"timestamp": "%(asctime)s", "process": "%(process)d", "severity": "%(levelname)s", "module": "%(module)s", "content": "%(message)s"})
         },
     },
     "handlers": {

@@ -1,4 +1,9 @@
+import logging
+
 from playwright.sync_api import sync_playwright, Page
+
+
+logger = logging.getLogger(__name__)
 
 
 class LobbyistNamesExtractor:
@@ -9,6 +14,7 @@ class LobbyistNamesExtractor:
     GO_TO_NEXT_PAGE_XPATH = '//a[contains(@id, "Next")]'
 
     def extract(self):
+        logger.info(f'{self.__class__.__name__} - starting to extract lobbyist names from {self.URL_WITH_LOBBYISTS_NAME_TO_SCRAPE}')
         with sync_playwright() as playwright_object:
             playwright_browser = playwright_object.firefox.launch()
             page = playwright_browser.new_page()
@@ -24,6 +30,7 @@ class LobbyistNamesExtractor:
 
         names = set()
         for page_index in range(10):
+            logger.info(f'{self.__class__.__name__} - scraping page {page_index + 1} - names found till now {names}')
             names.update(
                 self._get_names_from_current_page(playwright_page=playwright_page)
             )

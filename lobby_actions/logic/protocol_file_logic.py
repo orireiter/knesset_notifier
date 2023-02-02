@@ -17,6 +17,7 @@ class KnessetProtocolExtractor:
     PROTOCOL_FILE_URL = "https://storage.googleapis.com/knesset-data-pipelines/data/people/committees/meeting-attendees/kns_committeesession.csv"
 
     def extract(self):
+        logger.info(f'{self.__class__.__name__} - opening http stream to get file from url - {self.PROTOCOL_FILE_URL}')
         return requests.get(self.PROTOCOL_FILE_URL, stream=True)
 
 
@@ -156,8 +157,6 @@ class KnessetProtocolLoader:
 
 
 class KnessetProtocolsETL:
-    PROTOCOL_FILE_URL = "https://storage.googleapis.com/knesset-data-pipelines/data/people/committees/meeting-attendees/kns_committeesession.csv"
-
     def __init__(
         self,
         extractor: KnessetProtocolExtractor = KnessetProtocolExtractor(),
