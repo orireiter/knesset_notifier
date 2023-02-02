@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BlockingScheduler
 
 from lobby_actions.utils import load_env_vars
+
 load_env_vars()
 
 from lobby_actions.logic.lobbyist_logic import get_lobbyists_from_etl
@@ -18,7 +19,7 @@ scheduler = BlockingScheduler()
 
 @scheduler.scheduled_job("cron", day_of_week="sun", hour=7)
 def notify_lobbyists_actions_by_mail():
-    logger.info(f'{notify_lobbyists_actions_by_mail.__name__} - starting run')
+    logger.info(f"{notify_lobbyists_actions_by_mail.__name__} - starting run")
 
     try:
         lobbyists = get_lobbyists_from_etl()
@@ -28,12 +29,11 @@ def notify_lobbyists_actions_by_mail():
         )
         KnessetProtocolsETL(transformer=transformer).run_etl()
     except Exception as e:
-        logger.exception(f'{notify_lobbyists_actions_by_mail.__name__} - failed to run')
+        logger.exception(f"{notify_lobbyists_actions_by_mail.__name__} - failed to run")
 
-    logger.info(f'{notify_lobbyists_actions_by_mail.__name__} ending run')
+    logger.info(f"{notify_lobbyists_actions_by_mail.__name__} ending run")
 
 
 if __name__ == "__main__":
-    dictConfig(LOGGING_CONFIG)
-
+    notify_lobbyists_actions_by_mail()
     scheduler.start()

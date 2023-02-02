@@ -6,7 +6,15 @@ LOGGING_CONFIG = {
     "disable_existing_loggers": True,
     "formatters": {
         "base_formatter": {
-            "format": dumps({"timestamp": "%(asctime)s", "process": "%(process)d", "severity": "%(levelname)s", "module": "%(module)s", "content": "%(message)s"})
+            "format": dumps(
+                {
+                    "timestamp": "%(asctime)s",
+                    "process": "%(process)d",
+                    "severity": "%(levelname)s",
+                    "module": "%(module)s",
+                    "content": "%(message)s",
+                }
+            )
         },
     },
     "handlers": {
