@@ -9,3 +9,4 @@ typing_extensions==4.4.0
 urllib3==1.26.14
 playwright==1.29.1
 APScheduler==3.9.1.post1
+python-dotenv==0.21.1
