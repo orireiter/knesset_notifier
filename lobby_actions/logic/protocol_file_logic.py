@@ -85,8 +85,8 @@ class KnessetProtocolTransformer:
         return field_names_as_str.split(",")
 
     def _transform_line_to_dto(self, line: bytes) -> models.ProtocolLineDto:
+        as_str = line.decode()
         try:
-            as_str = line.decode()
 
             as_string_io = io.StringIO(as_str)
             as_list = list(csv.reader(as_string_io))[0]
@@ -97,10 +97,9 @@ class KnessetProtocolTransformer:
                 if self.RAW_FIELD_NAMES_TO_TRANSFORMED_DATA.get(key)
             }
 
-            logger.info(f"transforming {as_dict_with_field_names=}")
             return models.ProtocolLineDto(**as_dict_with_field_names)
         except Exception as e:
-            logger.exception(f"failed to transfrom line to dto {line.decode()}")
+            logger.exception(f"failed to transform line to dto {as_str}")
             raise e
 
     def _is_line_valid(self, protocol_line: models.ProtocolLineDto) -> bool:
