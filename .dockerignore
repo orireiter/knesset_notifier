@@ -1,0 +1,5 @@
+.env
+env.py
+venv
+.idea
+docker-compose
