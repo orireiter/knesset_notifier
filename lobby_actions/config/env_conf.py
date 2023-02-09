@@ -1,4 +1,5 @@
 import os
+import ast
 
 from dotenv import load_dotenv
 
@@ -24,10 +25,16 @@ class EnvironmentConfig:
 
         # init values
         self.gmail_smtp = ConfigModels.GmailSmtp(
-            server_url=os.environ.get("GMAIL_SMTP_SERVER_URL", ''),
-            server_port=os.environ.get("GMAIL_SMTP_SERVER_PORT", ''),
-            user_id=os.environ.get("GMAIL_SMTP_USER_ID", ''),
-            password=os.environ.get("GMAIL_SMTP_PASSWORD", ''),
+            server_url=os.environ.get("GMAIL_SMTP_SERVER_URL", ""),
+            server_port=os.environ.get("GMAIL_SMTP_SERVER_PORT", ""),
+            user_id=os.environ.get("GMAIL_SMTP_USER_ID", ""),
+            password=os.environ.get("GMAIL_SMTP_PASSWORD", ""),
+        )
+
+        self.application = ConfigModels.App(
+            lobby_actions_summary_emails_to_report_to=ast.literal_eval(
+                os.environ.get("LOBBY_ACTIONS_SUMMARY_EMAILS_TO_REPORT_TO")
+            )
         )
 
         self._is_instance_initialized = True
@@ -40,4 +47,3 @@ class EnvironmentConfig:
             return env.load_env_from_config()
 
         load_dotenv()
-

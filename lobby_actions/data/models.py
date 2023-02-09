@@ -77,3 +77,6 @@ class ConfigModels:
         server_port: str
         user_id: str
         password: str
+
+    class App(BaseModel):
+        lobby_actions_summary_emails_to_report_to: list[str]
