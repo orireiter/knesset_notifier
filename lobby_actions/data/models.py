@@ -69,3 +69,14 @@ class ProtocolLineDto(BaseModel):
     def parse_list_of_dict(cls, value, values, config, field):
         list_from_json = json.loads(value) if value else []
         return list_from_json
+
+
+class ConfigModels:
+    class GmailSmtp(BaseModel):
+        server_url: str
+        server_port: str
+        user_id: str
+        password: str
+
+    class App(BaseModel):
+        lobby_actions_summary_emails_to_report_to: list[str]

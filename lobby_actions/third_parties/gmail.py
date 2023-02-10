@@ -1,20 +1,22 @@
-import os
 import logging
 import smtplib
 
-# Here are the email package modules we'll need.
 from email.message import EmailMessage
 
+from lobby_actions.config.env_conf import EnvironmentConfig
+
+
+env_conf = EnvironmentConfig()
 logger = logging.getLogger(__name__)
 
 
 class GmailSmtp:
     def __init__(
         self,
-        smtp_server_url: str = os.environ.get("GMAIL_SMTP_SERVER_URL"),
-        smtp_server_port: int = int(os.environ.get("GMAIL_SMTP_SERVER_PORT")),
-        user_id: str = os.environ.get("GMAIL_SMTP_USER_ID"),
-        password: str = os.environ.get("GMAIL_SMTP_PASSWORD"),
+        smtp_server_url: str = env_conf.gmail_smtp.server_url,
+        smtp_server_port: int = int(env_conf.gmail_smtp.server_port),
+        user_id: str = env_conf.gmail_smtp.user_id,
+        password: str = env_conf.gmail_smtp.password,
     ):
         self._smtp_server_url = smtp_server_url
         self._smtp_server_port = smtp_server_port

@@ -8,8 +8,10 @@ import requests
 
 from lobby_actions.data import models
 from lobby_actions.third_parties.gmail import GmailSmtp
-from lobby_actions.config.lobby99_config import Lobby99Config
+from lobby_actions.config.env_conf import EnvironmentConfig
 
+
+env_conf = EnvironmentConfig()
 logger = logging.getLogger(__name__)
 
 
@@ -133,7 +135,7 @@ class KnessetProtocolLoader:
         try:
             mail_content = self._transform_data_to_mail_content(transformed_data)
             GmailSmtp().send_mail(
-                receivers=Lobby99Config.Email.LOBBY_ACTION_EMAILS_TO_REPORT_TO,
+                receivers=env_conf.application.lobby_actions_summary_emails_to_report_to,
                 subject="דו״ח פעילות לוביסטים שבועית",
                 content=mail_content,
                 is_rtl=True,
