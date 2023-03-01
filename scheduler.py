@@ -20,7 +20,7 @@ def notify_lobbyists_actions_by_mail():
     try:
         lobbyists = get_lobbyists_from_etl()
         transformer = KnessetProtocolTransformer(
-            x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=14),
+            x_days_ago_as_datetime=datetime.utcnow() - timedelta(days=200),
             lobbyists_to_check=lobbyists or [],
         )
         KnessetProtocolsETL(transformer=transformer).run_etl()
