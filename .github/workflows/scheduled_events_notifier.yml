@@ -9,6 +9,8 @@ jobs:
   scheduled_email_notification:
     runs-on: ubuntu-latest
     steps:
+      - name: check env
+        run: printenv
       - name: Set up Python 3.11.1
         uses: actions/setup-python@v3
         with:
