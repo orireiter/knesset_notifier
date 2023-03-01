@@ -1,6 +1,8 @@
 on:
   schedule:
     - cron: '0 7 1/14 * *'
+  workflow_dispatch:
+
 
 jobs:
   scheduled_email_notification:
