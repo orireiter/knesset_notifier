@@ -1,11 +1,20 @@
 on:
   schedule:
     - cron: '0 7 1/14 * *'
+  workflow_dispatch:
+
+env:
+  GMAIL_SMTP_PASSWORD: ${{ vars.GMAIL_SMTP_PASSWORD }}
+  GMAIL_SMTP_SERVER_PORT: ${{ vars.GMAIL_SMTP_SERVER_PORT }}
+  GMAIL_SMTP_SERVER_URL: ${{ vars.GMAIL_SMTP_SERVER_URL }}
+  GMAIL_SMTP_USER_ID: ${{ vars.GMAIL_SMTP_USER_ID }}
+  LOBBY_ACTIONS_SUMMARY_EMAILS_TO_REPORT_TO: ${{ vars.LOBBY_ACTIONS_SUMMARY_EMAILS_TO_REPORT_TO }}
 
 jobs:
   scheduled_email_notification:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Set up Python 3.11.1
         uses: actions/setup-python@v3
         with:
@@ -13,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt
       - name: install playwright dependencies
         run: |
           playwright install
