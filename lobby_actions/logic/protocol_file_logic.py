@@ -136,7 +136,7 @@ class KnessetProtocolLoader:
             mail_content = self._transform_data_to_mail_content(transformed_data)
             GmailSmtp().send_mail(
                 receivers=env_conf.application.lobby_actions_summary_emails_to_report_to,
-                subject="דו״ח פעילות לוביסטים שבועית",
+                subject="דו״ח פעילות לוביסטים",
                 content=mail_content,
                 is_rtl=True,
             )
@@ -144,7 +144,7 @@ class KnessetProtocolLoader:
             pass
 
     def _transform_data_to_mail_content(self, data: dict) -> str:
-        mail_content = "דו״ח פעילות לוביסטים שבועית:" + "\n\n"
+        mail_content = "דו״ח פעילות לוביסטים:" + "\n\n"
 
         for lobbyist_name, attended_events in data.items():
             mail_content += f"{lobbyist_name}:\n"
